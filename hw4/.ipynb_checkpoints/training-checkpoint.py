@@ -331,13 +331,33 @@ class TransformerEncoderTrainer(Trainer):
         num_correct = None
         # TODO:
         #  fill out the training loop.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
+       # ====== YOUR CODE: ======
+        self.optimizer.zero_grad() 
+        
+        # 1. Forward Pass
+        logits = self.model(input_ids, attention_mask)
+        
+        # --- התיקון כאן ---
+        # מועך את ה-logits מ- [Batch, 1] ל- [Batch] כדי שיתאים ל-label
+        logits = logits.squeeze(-1) 
+        
+        # 2. חישוב Loss 
+        loss = self.loss_fn(logits, label)
+        
+        # 3. Backward Pass 
+        loss.backward()
+        
+        # 4. צעד של האופטימיזטור
+        self.optimizer.step()
+        
+        # 5. חישוב כמות הניחושים הנכונים
+        preds = torch.round(torch.sigmoid(logits))
+        num_correct = torch.sum(preds == label)
         # ========================
-        
-        
+                
         
         return BatchResult(loss.item(), num_correct.item())
+        
         
     def test_batch(self, batch) -> BatchResult:
         with torch.no_grad():
@@ -350,7 +370,18 @@ class TransformerEncoderTrainer(Trainer):
             # TODO:
             #  fill out the testing loop.
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            # 1. Forward Pass 
+            logits = self.model(input_ids, attention_mask)
+            
+            # --- התיקון כאן ---
+            logits = logits.squeeze(-1)
+            
+            # 2. חישוב Loss
+            loss = self.loss_fn(logits, label)
+            
+            # 3. חישוב כמות הניחושים הנכונים
+            preds = torch.round(torch.sigmoid(logits))
+            num_correct = torch.sum(preds == label)
             # ========================
 
             

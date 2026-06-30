@@ -16,7 +16,7 @@ import os
 # on the course HPC.
 DATASETS_DIR = os.path.expanduser("~/datasets")
 
-# ==============
+# ==============בוא 
 # Part 1 answers
 
 
@@ -88,34 +88,34 @@ PART2_CUSTOM_DATA_URL = None
 
 def part2_transformer_encoder_hyperparams():
     hypers = dict(
-        embed_dim = 0, 
-        num_heads = 0,
-        num_layers = 0,
-        hidden_dim = 0,
-        window_size = 0,
-        droupout = 0.0,
-        lr=0.0,
+        embed_dim = 128, 
+        num_heads = 4,      # embed_dim חייב להתחלק במספר הראשים ללא שארית
+        num_layers = 3,
+        hidden_dim = 256,
+        window_size = 64,   # חייב להיות מספר זוגי
+        droupout = 0.1,     # שים לב ששגיאת הכתיב droupout מגיעה מהקוד המקורי, השארתי אותה
+        lr = 1e-4,
     )
 
     # TODO: Tweak the hyperparameters to train the transformer encoder.
     # ====== YOUR CODE: ======
-    raise NotImplementedError()
+    # No extra code needed here, the dict is updated above.
     # ========================
     return hypers
 
 
 
-
 part2_q1 = r"""
 **Your answer:**
-
-
+Similarly to the receptive field in Convolutional Neural Networks (CNNs), stacking layers with a sliding-window attention increases the effective context size linearly. In the first layer, a token attends only to $w$ neighboring tokens. However, in the second layer, that same token attends to its $w$ neighbors, which have already aggregated information from their own $w$ neighbors in the previous layer. This expands the effective context window to $2w$. After $L$ layers, the receptive field size becomes $L \times w$, allowing the deeper layers to capture a much broader, and potentially global, context of the input sequence.
 """
 
 part2_q2 = r"""
 **Your answer:**
+There are two common variations to achieve a more global context while maintaining the linear $O(n \cdot w)$ complexity:
 
-
+1. **Dilated Sliding Window:** Similar to dilated convolutions, we can introduce gaps in the attention window (e.g., attending to every $d$-th token instead of strictly consecutive ones). This increases the receptive field size exponentially across layers without increasing the computational cost per token.
+2. **Global Attention Tokens:** We can designate a few specific tokens (such as the `[CLS]` token) to have 'global attention'. These global tokens attend to all other tokens in the sequence, and conversely, all other tokens attend to them. Since the number of global tokens $g$ is small and constant, the added complexity is $O(g \cdot n)$, keeping the overall complexity linear while propagating global information to all tokens.
 """
 
 
